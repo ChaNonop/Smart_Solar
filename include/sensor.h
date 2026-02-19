@@ -39,7 +39,9 @@ public:
             uint8_t vBatteryPin, 
             uint8_t currentPin);
     void begin();
-    void readData();
+        // แยกฟังก์ชันการอ่านค่าออกจากกัน
+    void readData(); 
+    void readDHTData(); 
 
     // ฟังก์ชัน Getter ไว้สำหรับให้ main.cpp ดึงค่าไปใช้งาน
     float getTemp();

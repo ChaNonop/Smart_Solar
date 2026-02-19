@@ -43,26 +43,17 @@ void Sensor::begin() {
 //                 sensorValues[3]);
 // }
 
+// ฟังก์ชันที่ 1: อ่านค่า Analog (ทำงานเร็ว ไม่มี delay)
+// ---------------------------------------------------------
 void Sensor::readData() {
-    // ---- 1. อ่านค่า DHT ----
-    float t = _dht.readTemperature();
-    float h = _dht.readHumidity();
-    if (!isnan(t) && !isnan(h)) {
-        _temp = t;
-        _humid = h;
-    } else {
-        Serial.println(F("Failed to read DHT!"));
-    }
-
-    // ---- 2. อ่านค่า Analog แบบ Sampling (ค่าเฉลี่ย) ----
     long sumLight = 0, sumVSolar = 0, sumVBattery = 0, sumCurrent = 0;
     
+    // เอา delay(10) ออก เพื่อไม่ให้โปรแกรมค้าง การทำงานตรงนี้จะใช้เวลาแค่ไม่ถึง 5ms
     for(int j = 0; j < _sampling; j++){
         sumLight += analogRead(_lightPin);
         sumVSolar += analogRead(_vSolarPin);
         sumVBattery += analogRead(_vBatteryPin);
         sumCurrent += analogRead(_currentPin);
-        delay(10);
     }
 
     float avgLight = (float)sumLight / _sampling;
@@ -70,21 +61,72 @@ void Sensor::readData() {
     float avgVBattery = (float)sumVBattery / _sampling;
     float avgCurrent = (float)sumCurrent / _sampling;
 
-    // ---- 3. แปลงค่าดิบให้เป็นค่าจริง (Process Data) ----
     _light = (int)avgLight;
 
-    // สมการแบ่งแรงดัน: (ค่าดิบ * อัตราส่วนแรงดันอ้างอิง) * ตัวคูณ R
-    float analogToVoltage = 5.0 / 1023.0; // Arduino Uno ทำงานที่ 5V 10-bit
+    float analogToVoltage = 5.0 / 1023.0; 
     float resistorRatio = (_R1 + _R2) / _R2;
     
     _vSolar = (avgVSolar * analogToVoltage) * resistorRatio;
     _vBattery = (avgVBattery * analogToVoltage) * resistorRatio;
-    
-    // กระแสไฟฟ้า: ค่าชั่วคราว ดึงจาก Analog ตรงๆ (หากใช้ ACS712 ต้องลบออฟเซ็ต)
     _current = avgCurrent * analogToVoltage; 
-    
     _power = _vSolar * _current;
 }
+
+// อ่านค่า DHT 
+void Sensor::readDHTData() {
+    float t = _dht.readTemperature();
+    float h = _dht.readHumidity();
+    
+    // ถ้าอ่านสำเร็จค่อยบันทึกค่า ถ้าไม่สำเร็จให้ใช้ค่าเดิมไปก่อน
+    if (!isnan(t) && !isnan(h)) {
+        _temp = t;
+        _humid = h;
+    } else {
+        Serial.println(F("Failed to read DHT!"));
+    }
+}
+
+// void Sensor::readData() {
+//     float t = _dht.readTemperature();
+//     float h = _dht.readHumidity();
+//     if (!isnan(t) && !isnan(h)) {
+//         _temp = t;
+//         _humid = h;
+//     } else {
+//         Serial.println(F("Failed to read DHT!"));
+//     }
+
+//     // ---- 2. อ่านค่า Analog แบบ Sampling (ค่าเฉลี่ย) ----
+//     long sumLight = 0, sumVSolar = 0, sumVBattery = 0, sumCurrent = 0;
+    
+//     for(int j = 0; j < _sampling; j++){
+//         sumLight += analogRead(_lightPin);
+//         sumVSolar += analogRead(_vSolarPin);
+//         sumVBattery += analogRead(_vBatteryPin);
+//         sumCurrent += analogRead(_currentPin);
+//         delay(10);
+//     }
+
+//     float avgLight = (float)sumLight / _sampling;
+//     float avgVSolar = (float)sumVSolar / _sampling;
+//     float avgVBattery = (float)sumVBattery / _sampling;
+//     float avgCurrent = (float)sumCurrent / _sampling;
+
+//     // ---- 3. แปลงค่าดิบให้เป็นค่าจริง (Process Data) ----
+//     _light = (int)avgLight;
+
+//     // สมการแบ่งแรงดัน: (ค่าดิบ * อัตราส่วนแรงดันอ้างอิง) * ตัวคูณ R
+//     float analogToVoltage = 5.0 / 1023.0; // Arduino Uno ทำงานที่ 5V 10-bit
+//     float resistorRatio = (_R1 + _R2) / _R2;
+    
+//     _vSolar = (avgVSolar * analogToVoltage) * resistorRatio;
+//     _vBattery = (avgVBattery * analogToVoltage) * resistorRatio;
+    
+//     // กระแสไฟฟ้า: ค่าชั่วคราว ดึงจาก Analog ตรงๆ (หากใช้ ACS712 ต้องลบออฟเซ็ต)
+//     _current = avgCurrent * analogToVoltage; 
+    
+//     _power = _vSolar * _current;
+// }
 
 // ---- Getters ----
 float Sensor::getTemp() { return _temp; }
