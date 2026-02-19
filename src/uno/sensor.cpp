@@ -1,79 +1,96 @@
 #include "sensor.h"
 
-sensor::sensor(uint8_t dhtPin, uint8_t dhtType, uint8_t aPin)
-:   _dht(dht),
-    _analogPin(aPin),
-    _temp(0),
-    _humid(0),
-    _analogValue(0)
-    _R1(30000),
-    _R2(7500)
+Sensor::Sensor(uint8_t dhtPin, uint8_t dhtType, uint8_t lightPin, uint8_t vSolarPin, uint8_t vBatteryPin, uint8_t currentPin)
+:   _dht(dhtPin, dhtType),
+    _lightPin(lightPin),
+    _vSolarPin(vSolarPin),
+    _vBatteryPin(vBatteryPin),
+    _currentPin(currentPin),
+    _temp(0.0),
+    _humid(0.0),
+    _light(0),
+    _vSolar(0.0),
+    _vBattery(0.0),
+    _current(0.0),
+    _power(0.0),
+    _R1(30000.0), // ตัวต้านทาน 30k Ohm
+    _R2(7500.0),  // ตัวต้านทาน 7.5k Ohm
+    _sampling(10)
 {
-    //constructure
-    sampling = 10;
 }
 
-void sensor::begin()
-{
-    dht.begin();
+void Sensor::begin() {
+    _dht.begin();
+    pinMode(_lightPin, INPUT);
+    pinMode(_vSolarPin, INPUT);
+    pinMode(_vBatteryPin, INPUT);
+    pinMode(_currentPin, INPUT);
 }
 
-void sensor::ProcessData(Data[4]){
-    int light = Data[0];
-    int vsolar = Data[1]*(R1+R2)/R2;
-    int vbattery = Data[2]*(R1+R2)/R2;
-    int current = Data[3];
-    int power = vsolar * current;
-}
-void sensor::readData(){
-    int readbutton = digitalRead(Pin_Button);
-    for (int i = 0; i < Sensor_Pin; i++) {
-        long sum = 0;
-        for(int j = 0; j < sampling; j++){
-            sum += analogRead(sensorPins[i]);
-            delay(10);
-        }
-        sensorValues[i] = (float)sum / sampling;
-    }
-    Data(sensorValues[0],
-                sensorValues[1], 
-                sensorValues[2], 
-                sensorValues[3]);
-}
-void Relay(bool state){
-    digitalWrite(Relay_Pin, state);
-}
+// void sensor::readData(){
+//     int readbutton = digitalRead(Pin_Button);
+//     for (int i = 0; i < Sensor_Pin; i++) {
+//         long sum = 0;
+//         for(int j = 0; j < sampling; j++){
+//             sum += analogRead(sensorPins[i]);
+//             delay(10);
+//         }
+//         sensorValues[i] = (float)sum / sampling;
+//     }
+//     Data(sensorValues[0],
+//                 sensorValues[1], 
+//                 sensorValues[2], 
+//                 sensorValues[3]);
+// }
 
-float sensor::getTemp_humid(){
-    _temp = dht.readTemperature();
-    _humid = dht.readHumidity();
-    if (isnan(_temp) || isnan(_humid)) {
-        Serial.println(F("Failed to read from DHT sensor!"));
-        return;
+void Sensor::readData() {
+    // ---- 1. อ่านค่า DHT ----
+    float t = _dht.readTemperature();
+    float h = _dht.readHumidity();
+    if (!isnan(t) && !isnan(h)) {
+        _temp = t;
+        _humid = h;
+    } else {
+        Serial.println(F("Failed to read DHT!"));
     }
-    return _temp , _humid;
-}
-void sensor::sendData(){
-    static unsigned long lastUpdateTime = 0; 
-    // Local Variable (กระดาษทด) ดึงเวลาปัจจุบันมาเช็ค
-    unsigned long currentTime = millis();
-    if(currentTime - lastUpdateTime >= time_Read){
-        lastUpdateTime = currentTime;
-        SaticjsonDoc<200> doc;
-        doc["Temp"] = sensor.PrecessData.getTemp_humid._temp();
-        doc["Humid"] = sensor.PrecessData.getTemp_humid._humid();
-        doc["V_solar"] = sensor.PrecessData.V_solar();
-        doc["V_battery"] = sensor.PrecessData.V_battery();
-        doc["I"] = sensor.PrecessData.current();
-        doc["P"] = sensor.PrecessData.Power();
-        doc["Light"] = sensor.PrecessData.light();
-    }
+
+    // ---- 2. อ่านค่า Analog แบบ Sampling (ค่าเฉลี่ย) ----
+    long sumLight = 0, sumVSolar = 0, sumVBattery = 0, sumCurrent = 0;
     
-    // ส่งข้อมูลออกไปทาง SoftwareSerial ไปหา ESP8266
-    serializeJson(doc, espSerial);
-    espSerial.println(); // ปิดท้ายด้วย New line เพื่อให้ฝั่งรับรู้ว่าจบแพ็กเกจ
+    for(int j = 0; j < _sampling; j++){
+        sumLight += analogRead(_lightPin);
+        sumVSolar += analogRead(_vSolarPin);
+        sumVBattery += analogRead(_vBatteryPin);
+        sumCurrent += analogRead(_currentPin);
+        delay(10);
+    }
 
-    // ปริ้นท์ดูบน Serial Monitor ของคอมด้วย
-    serializeJson(doc, Serial);
-    Serial.println();
+    float avgLight = (float)sumLight / _sampling;
+    float avgVSolar = (float)sumVSolar / _sampling;
+    float avgVBattery = (float)sumVBattery / _sampling;
+    float avgCurrent = (float)sumCurrent / _sampling;
+
+    // ---- 3. แปลงค่าดิบให้เป็นค่าจริง (Process Data) ----
+    _light = (int)avgLight;
+
+    // สมการแบ่งแรงดัน: (ค่าดิบ * อัตราส่วนแรงดันอ้างอิง) * ตัวคูณ R
+    float analogToVoltage = 5.0 / 1023.0; // Arduino Uno ทำงานที่ 5V 10-bit
+    float resistorRatio = (_R1 + _R2) / _R2;
+    
+    _vSolar = (avgVSolar * analogToVoltage) * resistorRatio;
+    _vBattery = (avgVBattery * analogToVoltage) * resistorRatio;
+    
+    // กระแสไฟฟ้า: ค่าชั่วคราว ดึงจาก Analog ตรงๆ (หากใช้ ACS712 ต้องลบออฟเซ็ต)
+    _current = avgCurrent * analogToVoltage; 
+    
+    _power = _vSolar * _current;
 }
+
+// ---- Getters ----
+float Sensor::getTemp() { return _temp; }
+float Sensor::getHumid() { return _humid; }
+int Sensor::getLight() { return _light; }
+float Sensor::getVSolar() { return _vSolar; }
+float Sensor::getVBattery() { return _vBattery; }
+float Sensor::getCurrent() { return _current; }
+float Sensor::getPower() { return _power; }
