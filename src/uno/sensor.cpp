@@ -1,11 +1,11 @@
 #include "sensor.h"
 
-Sensor::Sensor(uint8_t dhtPin, uint8_t dhtType, uint8_t lightPin, uint8_t vSolarPin, uint8_t vBatteryPin, uint8_t currentPin)
-:   _dht(dhtPin, dhtType),
-    _lightPin(lightPin),
-    _vSolarPin(vSolarPin),
-    _vBatteryPin(vBatteryPin),
-    _currentPin(currentPin),
+Sensor::Sensor(uint8_t pinDht, uint8_t dhtType, uint8_t pinLight, uint8_t pinVSolar, uint8_t pinVBattery, uint8_t pinCurrent)
+:   _dht(pinDht, dhtType),
+    _lightPin(pinLight),
+    _vSolarPin(pinVSolar),
+    _vBatteryPin(pinVBattery),
+    _currentPin(pinCurrent),
     _temp(0.0),
     _humid(0.0),
     _light(0),
@@ -27,28 +27,11 @@ void Sensor::begin() {
     pinMode(_currentPin, INPUT);
 }
 
-// void sensor::readData(){
-//     int readbutton = digitalRead(Pin_Button);
-//     for (int i = 0; i < Sensor_Pin; i++) {
-//         long sum = 0;
-//         for(int j = 0; j < sampling; j++){
-//             sum += analogRead(sensorPins[i]);
-//             delay(10);
-//         }
-//         sensorValues[i] = (float)sum / sampling;
-//     }
-//     Data(sensorValues[0],
-//                 sensorValues[1], 
-//                 sensorValues[2], 
-//                 sensorValues[3]);
-// }
 
-// ฟังก์ชันที่ 1: อ่านค่า Analog (ทำงานเร็ว ไม่มี delay)
-// ---------------------------------------------------------
+// ฟังก์ชันที่ 1: อ่านค่า Analog 
 void Sensor::readData() {
     long sumLight = 0, sumVSolar = 0, sumVBattery = 0, sumCurrent = 0;
     
-    // เอา delay(10) ออก เพื่อไม่ให้โปรแกรมค้าง การทำงานตรงนี้จะใช้เวลาแค่ไม่ถึง 5ms
     for(int j = 0; j < _sampling; j++){
         sumLight += analogRead(_lightPin);
         sumVSolar += analogRead(_vSolarPin);
@@ -86,53 +69,11 @@ void Sensor::readDHTData() {
     }
 }
 
-// void Sensor::readData() {
-//     float t = _dht.readTemperature();
-//     float h = _dht.readHumidity();
-//     if (!isnan(t) && !isnan(h)) {
-//         _temp = t;
-//         _humid = h;
-//     } else {
-//         Serial.println(F("Failed to read DHT!"));
-//     }
-
-//     // ---- 2. อ่านค่า Analog แบบ Sampling (ค่าเฉลี่ย) ----
-//     long sumLight = 0, sumVSolar = 0, sumVBattery = 0, sumCurrent = 0;
-    
-//     for(int j = 0; j < _sampling; j++){
-//         sumLight += analogRead(_lightPin);
-//         sumVSolar += analogRead(_vSolarPin);
-//         sumVBattery += analogRead(_vBatteryPin);
-//         sumCurrent += analogRead(_currentPin);
-//         delay(10);
-//     }
-
-//     float avgLight = (float)sumLight / _sampling;
-//     float avgVSolar = (float)sumVSolar / _sampling;
-//     float avgVBattery = (float)sumVBattery / _sampling;
-//     float avgCurrent = (float)sumCurrent / _sampling;
-
-//     // ---- 3. แปลงค่าดิบให้เป็นค่าจริง (Process Data) ----
-//     _light = (int)avgLight;
-
-//     // สมการแบ่งแรงดัน: (ค่าดิบ * อัตราส่วนแรงดันอ้างอิง) * ตัวคูณ R
-//     float analogToVoltage = 5.0 / 1023.0; // Arduino Uno ทำงานที่ 5V 10-bit
-//     float resistorRatio = (_R1 + _R2) / _R2;
-    
-//     _vSolar = (avgVSolar * analogToVoltage) * resistorRatio;
-//     _vBattery = (avgVBattery * analogToVoltage) * resistorRatio;
-    
-//     // กระแสไฟฟ้า: ค่าชั่วคราว ดึงจาก Analog ตรงๆ (หากใช้ ACS712 ต้องลบออฟเซ็ต)
-//     _current = avgCurrent * analogToVoltage; 
-    
-//     _power = _vSolar * _current;
-// }
-
 // ---- Getters ----
-float Sensor::getTemp() { return _temp; }
-float Sensor::getHumid() { return _humid; }
-int Sensor::getLight() { return _light; }
-float Sensor::getVSolar() { return _vSolar; }
-float Sensor::getVBattery() { return _vBattery; }
-float Sensor::getCurrent() { return _current; }
-float Sensor::getPower() { return _power; }
+float Sensor::getTemp() { return .2f * (float)_temp; }
+float Sensor::getHumid() { return .2f * (float)_humid; }
+int Sensor::getLight() { return .2f * (float)_light; }
+float Sensor::getVSolar() { return .2f * (float)_vSolar; }
+float Sensor::getVBattery() { return .2f * (float)_vBattery; }
+float Sensor::getCurrent() { return .2f * (float)_current; }
+float Sensor::getPower() { return .2f * (float)_power; }

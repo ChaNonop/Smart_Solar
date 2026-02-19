@@ -31,13 +31,14 @@ private:
     byte _sampling;
 
 public:
-    // Constructor รับค่าขาสัญญาณทั้งหมด
-    Sensor( uint8_t dhtPin,
+        // Constructor รับค่าขาสัญญาณทั้งหมด
+        // Param names use different identifiers to avoid conflicts with build-time macros
+        Sensor( uint8_t pinDht,
             uint8_t dhtType, 
-            uint8_t lightPin, 
-            uint8_t vSolarPin, 
-            uint8_t vBatteryPin, 
-            uint8_t currentPin);
+            uint8_t pinLight, 
+            uint8_t pinVSolar, 
+            uint8_t pinVBattery, 
+            uint8_t pinCurrent);
     void begin();
         // แยกฟังก์ชันการอ่านค่าออกจากกัน
     void readData(); 

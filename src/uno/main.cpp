@@ -4,11 +4,11 @@
 
 #include "sensor.h"
 
-// SoftwareSerial เป็น 10(RX), 11(TX)
-SoftwareSerial espSerial(RX, TX); // 10 , 11
+// SoftwareSerial เป็น 3(RX), 1(TX)
+SoftwareSerial espSerial(RX, TX); // 3 , 1
 
 // สร้าง Object sensor
-Sensor mySensor(dhtPin, DHT11, Light_Pin, Voltage_Pin_solar, Voltage_Pin_Battery, Current_Pin);
+Sensor mySensor(dhtPin,DHT11, Light_Pin, Voltage_Pin_solar, Voltage_Pin_Battery, Current_Pin);
 
 // กำหนดเวลา Timers (มิลลิวินาที)
 const unsigned long INTERVAL_ANALOG = 50;    // อ่าน Analog ทุกๆ 50ms 
@@ -53,7 +53,7 @@ void loop() {
   if (currentMillis - lastSerialSend >= INTERVAL_SEND) {
       lastSerialSend = currentMillis;
 
-      StaticJsonDocument<200> doc;
+      StaticJsonDocument<200> doc; 
       doc["Temp"] = mySensor.getTemp();
       doc["Humid"] = mySensor.getHumid();
       doc["V_solar"] = mySensor.getVSolar();
