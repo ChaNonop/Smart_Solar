@@ -36,9 +36,6 @@ void CommManager::sendSensorData(Sensor& sensor) {
     doc["Humid"] = sensor.getHumid();
     doc["V_solar"] = sensor.getVSolar();
     doc["V_battery"] = sensor.getVBattery();
-    doc["I"] = sensor.getCurrent();
-    doc["P"] = sensor.getPower();
-    doc["Light"] = sensor.getLight();
 
     serializeJson(doc, _serial);
     _serial.println(); 

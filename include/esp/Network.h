@@ -8,7 +8,7 @@
 #include <WiFiUdp.h>
 
 // #include <U8g2lib.h>
-#include <secret.h>
+#include <esp/secret.h>
 class Network {
 private:
   WiFiClient _espClient;

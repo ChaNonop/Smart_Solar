@@ -4,13 +4,17 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-#include "Network.h"
-#include "secret.h"
+#include "esp/Network.h"
+#include "esp/secret.h"
+#include "esp/sd_card.h"
+
+Network net;
+SDCard sd;
 
 void setup() {
     Serial.begin(115200)
 }
 
 void loop() {
-    
+
 }

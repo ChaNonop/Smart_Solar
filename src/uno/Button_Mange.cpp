@@ -1,31 +1,5 @@
 #include "uno/Button_Manange.h"
 
-// static ButtonManager* isrInstance = nullptr;
-
-// // กำหนดค่าเริ่มต้นให้กับ Pointer
-// ButtonManager* ButtonManager:: _instance = nullptr;
-
-// ButtonManager::ButtonManager() {
-//     _instance = this;
-//     isrInstance = this;
-//     for(int i = 0; i < 4; i++) {
-//         _btnStates[i] = false;
-//     }
-// }
-
-// void ButtonManager::begin() {
-//     // กำหนดขา D5, D6, D7, D8 เป็น INPUT_PULLUP
-//     pinMode(5, INPUT_PULLUP);
-//     pinMode(6, INPUT_PULLUP);
-//     pinMode(7, INPUT_PULLUP);
-//     pinMode(8, INPUT_PULLUP);
-
-//     // เปิดใช้งาน Interrupt ระดับ Hardware
-//     PCICR |= (1 << PCIE2) | (1 << PCIE0); //ขา d5
-//     PCMSK2 |= (1 << PCINT21) | (1 << PCINT22) | (1 << PCINT23); // ขา D5-D7
-//     PCMSK0 |= (1 << PCINT0);  // ขา D8
-// }
-
 ButtonManager::ButtonManager() {
     for(int i = 0; i < 4; i++) {
         _btnStates[i] = false;
@@ -65,6 +39,32 @@ bool ButtonManager::isPressed(uint8_t index) {
 void ButtonManager::clearState(uint8_t index) {
     if (index < 4) _btnStates[index] = false;
 }
+
+// static ButtonManager* isrInstance = nullptr;
+
+// // กำหนดค่าเริ่มต้นให้กับ Pointer
+// ButtonManager* ButtonManager:: _instance = nullptr;
+
+// ButtonManager::ButtonManager() {
+//     _instance = this;
+//     isrInstance = this;
+//     for(int i = 0; i < 4; i++) {
+//         _btnStates[i] = false;
+//     }
+// }
+
+// void ButtonManager::begin() {
+//     // กำหนดขา D5, D6, D7, D8 เป็น INPUT_PULLUP
+//     pinMode(5, INPUT_PULLUP);
+//     pinMode(6, INPUT_PULLUP);
+//     pinMode(7, INPUT_PULLUP);
+//     pinMode(8, INPUT_PULLUP);
+
+//     // เปิดใช้งาน Interrupt ระดับ Hardware
+//     PCICR |= (1 << PCIE2) | (1 << PCIE0); //ขา d5
+//     PCMSK2 |= (1 << PCINT21) | (1 << PCINT22) | (1 << PCINT23); // ขา D5-D7
+//     PCMSK0 |= (1 << PCINT0);  // ขา D8
+// }
 
 // // เมื่อเกิด Interrupt กลุ่ม D (ขา 5,6,7) จะเข้ามาทำงานฟังก์ชันนี้
 // void ButtonManager::handleISR_D() {
