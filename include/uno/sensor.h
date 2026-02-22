@@ -10,7 +10,7 @@
 class Sensor {
 private:
     DHT _dht;
-    
+
     uint8_t _lightPin;
     uint8_t _vSolarPin;
     uint8_t _vBatteryPin;
@@ -32,17 +32,20 @@ private:
 
 public:
         // Constructor รับค่าขาสัญญาณทั้งหมด
-        // Param names use different identifiers to avoid conflicts with build-time macros
         Sensor( uint8_t pinDht,
             uint8_t dhtType, 
             uint8_t pinLight, 
             uint8_t pinVSolar, 
             uint8_t pinVBattery, 
             uint8_t pinCurrent);
+            
     void begin();
-        // แยกฟังก์ชันการอ่านค่าออกจากกัน
     void readData(); 
     void readDHTData(); 
+    void Button(bool state);
+    
+    // ฟังก์ชันใหม่สำหรับแสดงค่าขึ้นจอ LCD
+    void displayLCD(); 
 
     // ฟังก์ชัน Getter ไว้สำหรับให้ main.cpp ดึงค่าไปใช้งาน
     float getTemp();

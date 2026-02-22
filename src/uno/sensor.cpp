@@ -1,4 +1,4 @@
-#include "sensor.h"
+#include "uno/sensor.h"
 
 Sensor::Sensor(uint8_t pinDht, uint8_t dhtType, uint8_t pinLight, uint8_t pinVSolar, uint8_t pinVBattery, uint8_t pinCurrent)
 :   _dht(pinDht, dhtType),
@@ -25,6 +25,8 @@ void Sensor::begin() {
     pinMode(_vSolarPin, INPUT);
     pinMode(_vBatteryPin, INPUT);
     pinMode(_currentPin, INPUT);
+    pinMode(Relay_Pin, OUTPUT);
+    pinMode(Pin_Button, INPUT_PULLUP)
 }
 
 
@@ -60,7 +62,7 @@ void Sensor::readDHTData() {
     float t = _dht.readTemperature();
     float h = _dht.readHumidity();
     
-    // ถ้าอ่านสำเร็จค่อยบันทึกค่า ถ้าไม่สำเร็จให้ใช้ค่าเดิมไปก่อน
+    // อ่านสำเร็จค่อยบันทึกค่า ถ้าไม่สำเร็จให้ใช้ค่าเดิมไปก่อน
     if (!isnan(t) && !isnan(h)) {
         _temp = t;
         _humid = h;
@@ -68,6 +70,7 @@ void Sensor::readDHTData() {
         Serial.println(F("Failed to read DHT!"));
     }
 }
+
 
 // ---- Getters ----
 float Sensor::getTemp() { return .2f * (float)_temp; }

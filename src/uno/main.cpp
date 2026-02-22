@@ -2,70 +2,79 @@
 #include <SoftwareSerial.h>
 #include <ArduinoJson.h>
 
-#include "sensor.h"
-
-// SoftwareSerial เป็น 3(RX), 1(TX)
-SoftwareSerial espSerial(RX, TX); // 3 , 1
+#include "uno/sensor.h"
+#include "uno/Send_Callback.h"
+#include "uno/Button_Manange.h"
 
 // สร้าง Object sensor
 Sensor mySensor(dhtPin,DHT11, Light_Pin, Voltage_Pin_solar, Voltage_Pin_Battery, Current_Pin);
 
-const unsigned long INTERVAL_ANALOG = 50;    // อ่าน Analog ทุกๆ 50ms 
-const unsigned long INTERVAL_DHT = 2000;     // อ่าน DHT ทุกๆ 2 วินาที
-const unsigned long INTERVAL_SEND = 2500;    // ส่งข้อมูลทาง Serial ทุกๆ 2.5 วินาที
+// 1. สร้าง Objects ของระบบต่างๆ
+ButtonManager btnManager;
+CommManager comm(3, 1); // RX=3, TX=1
+
+// 2. กำหนดช่วงเวลาทำงาน
+const unsigned long INTERVAL_ANALOG = 50;    
+const unsigned long INTERVAL_DHT = 2000;     
+const unsigned long INTERVAL_SEND = 2500;    
+const unsigned long INTERVAL_LCD = 1000; 
 
 // ตัวแปรเก็บเวลา
 unsigned long lastAnalogRead = 0;
 unsigned long lastDHTRead = 0;
 unsigned long lastSerialSend = 0;
+unsigned long lastLCDUpdate = 0;
+
 
 void setup() {
   Serial.begin(115200);
-  espSerial.begin(9600);
-
+  
   mySensor.begin();
+  btnManager.begin();
+  comm.begin(9600);
+  
   pinMode(Relay_Pin, OUTPUT);
-  pinMode(Pin_Button, INPUT_PULLUP);
 }
 
 void loop() {
   unsigned long currentMillis = millis();
   
-  // Task 1: อ่านค่า Analog และเช็ค Relay (ทุก 50ms)
+  // --- Task 1: อ่านค่า Analog ---
   if (currentMillis - lastAnalogRead >= INTERVAL_ANALOG) {
       lastAnalogRead = currentMillis;
-      
       mySensor.readData();
       
-      if(mySensor.getLight() >= 100){
-          digitalWrite(Relay_Pin, HIGH);
-      } else {
-          digitalWrite(Relay_Pin, LOW);
+      if(mySensor.getLight() >= 100) digitalWrite(Relay_Pin, HIGH);
+      else digitalWrite(Relay_Pin, LOW);
+  }
+
+  // --- Task 2: อ่านค่า DHT11 ---
+  if (currentMillis - lastDHTRead >= INTERVAL_DHT) {
+      lastDHTRead = currentMillis;
+      mySensor.readDHTData();
+  }
+
+  // --- Task 3: อัปเดตหน้าจอ LCD ---
+  if (currentMillis - lastLCDUpdate >= INTERVAL_LCD) {
+      lastLCDUpdate = currentMillis;
+      mySensor.displayLCD();
+  }
+
+  // --- Task 4: รับค่าจาก ESP8266 ---
+  comm.receiveCommands();
+
+  // --- Task 5: ตรวจสอบการกดปุ่ม ---
+  for (int i = 0; i < 4; i++) {
+      if (btnManager.isPressed(i)) {
+          // Serial.printf("Button %d Pressed!\n", i + 1);
+          btnManager.clearState(i); // ล้างสถานะหลังประมวลผลเสร็จ
+          delay(10); 
       }
   }
-  // Task 2: อ่านค่า DHT11 (ทุก 2 วินาที)
-  if (currentMillis - lastDHTRead >= INTERVAL_DHT) {
-    lastDHTRead = currentMillis;
-    mySensor.readDHTData();
-  }
-  // Task 3: ส่งข้อมูลไป ESP8266 และขึ้นจอคอม (ทุก 3 วินาที)
+
+  // --- Task 6: ส่งข้อมูลไป ESP8266 ---
   if (currentMillis - lastSerialSend >= INTERVAL_SEND) {
       lastSerialSend = currentMillis;
-
-      StaticJsonDocument<200> doc; 
-      doc["Temp"] = mySensor.getTemp();
-      doc["Humid"] = mySensor.getHumid();
-      doc["V_solar"] = mySensor.getVSolar();
-      doc["V_battery"] = mySensor.getVBattery();
-      doc["I"] = mySensor.getCurrent();
-      doc["P"] = mySensor.getPower();
-      doc["Light"] = mySensor.getLight();
-      doc["Button"] = !digitalRead(Pin_Button); // สลับค่า (ถ้าต่อแบบ PULLUP กดจะเป็น 0, ไม่กดเป็น 1)
-
-      serializeJson(doc, espSerial);
-      espSerial.println(); 
-
-      serializeJson(doc, Serial);
-      Serial.println();
+      comm.sendSensorData(mySensor); // โยน Object sensor ให้ Comm จัดการดึงค่าไปส่ง
   }
 }
