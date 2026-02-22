@@ -23,9 +23,6 @@ public:
     bool isPressed(uint8_t index); 
     void clearState(uint8_t index); 
     
-    // bool isPressed(uint8_t index); // เช็คว่าปุ่มที่ 0-3 ถูกกดหรือไม่
-    // void clearState(uint8_t index); // ล้างสถานะเมื่ออ่านค่าไปแล้ว
-    
     // // ฟังก์ชันสำหรับให้ ISR เรียกใช้ (ต้องเป็น static หรือ public)
     // void handleISR_D();
     // void handleISR_B();

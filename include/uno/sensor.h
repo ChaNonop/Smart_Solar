@@ -7,6 +7,8 @@
 #include <DHT.h>
 #include <DHT_U.h>
 
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
 class Sensor {
 private:
     DHT _dht;
