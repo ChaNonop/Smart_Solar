@@ -10,7 +10,6 @@ SoftwareSerial espSerial(RX, TX); // 3 , 1
 // สร้าง Object sensor
 Sensor mySensor(dhtPin,DHT11, Light_Pin, Voltage_Pin_solar, Voltage_Pin_Battery, Current_Pin);
 
-// กำหนดเวลา Timers (มิลลิวินาที)
 const unsigned long INTERVAL_ANALOG = 50;    // อ่าน Analog ทุกๆ 50ms 
 const unsigned long INTERVAL_DHT = 2000;     // อ่าน DHT ทุกๆ 2 วินาที
 const unsigned long INTERVAL_SEND = 2500;    // ส่งข้อมูลทาง Serial ทุกๆ 2.5 วินาที

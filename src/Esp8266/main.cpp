@@ -7,6 +7,10 @@
 #include "Network.h"
 #include "secret.h"
 
-void setup() {}
+void setup() {
+    Serial.begin(115200)
+}
 
-void loop() {}
+void loop() {
+    
+}

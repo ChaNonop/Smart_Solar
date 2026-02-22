@@ -2,7 +2,7 @@
 #define NETWORK_H
 
 #include <Arduino.h>
-#include <WiFi.h>
+#include <ESP8266Wifi.h>
 #include <PubSubClient.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
@@ -23,9 +23,10 @@ public:
   void connectWifi();      
   void connectMQTT();
   void loop_connect_MQTT();
+
   void Publish_Sensor(float volatge_solar,float voltage_battery,float current, float temp, int power, bool buttonState);
   
-  void Callback(char* topic, uint8_t* payload, unsigned int length); // made public
+  void Callback(char* topic, uint8_t* payload, unsigned int length); 
 };
 
 #endif 
