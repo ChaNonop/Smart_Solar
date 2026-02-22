@@ -2,6 +2,7 @@
 
 Sensor::Sensor(uint8_t pinDht, uint8_t dhtType, uint8_t pinLight, uint8_t pinVSolar, uint8_t pinVBattery, uint8_t pinCurrent)
 :   _dht(pinDht, dhtType),
+    _lcd(0x27, 16, 2),
     _lightPin(pinLight),
     _vSolarPin(pinVSolar),
     _vBatteryPin(pinVBattery),
@@ -26,9 +27,20 @@ void Sensor::begin() {
     pinMode(_vBatteryPin, INPUT);
     pinMode(_currentPin, INPUT);
     pinMode(Relay_Pin, OUTPUT);
-    pinMode(Pin_Button, INPUT_PULLUP)
+    pinMode(Pin_Button, INPUT_PULLUP);
 }
 
+void Sensor::displayLCD() {
+    _lcd.setCursor(0, 0);
+    _lcd.print("V:"); _lcd.print(_vSolar, 1);
+    _lcd.print(" I:"); _lcd.print(_current, 2);
+    _lcd.print(" P:"); _lcd.print((int)_power);
+    
+    _lcd.setCursor(0, 1);
+    _lcd.print("T:"); _lcd.print(_temp, 1);
+    _lcd.print("C H:"); _lcd.print((int)_humid);
+    _lcd.print("%  "); 
+}
 
 // ฟังก์ชันที่ 1: อ่านค่า Analog 
 void Sensor::readData() {

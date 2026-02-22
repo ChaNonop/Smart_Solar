@@ -10,6 +10,7 @@
 class Sensor {
 private:
     DHT _dht;
+    LiquidCrystal_I2C _lcd; // สร้าง Object สำหรับ LCD
 
     uint8_t _lightPin;
     uint8_t _vSolarPin;
