@@ -9,3 +9,171 @@ in the development cycle.
 
 More information about PlatformIO Unit Testing:
 - https://docs.platformio.org/en/latest/advanced/unit-testing/index.html
+
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:FFB75E,100:ED8F03&height=200&section=header&text=☀️%20Smart%20Solar&fontSize=50&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=IoT%20Solar%20Monitoring%20%26%20Control%20System&descAlignY=55&descSize=20" width="100%"/>
+
+<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&duration=3000&pause=1000&color=ED8F03&center=true&vCenter=true&multiline=true&repeat=true&width=600&height=100&lines=Smart+Solar+Monitoring+System;Real-time+Data+with+Grafana+%26+InfluxDB;Automated+Load+Switching+Control" alt="Typing SVG" /></a>
+
+<p>
+  <img src="https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white" alt="C++"/>
+  <img src="https://img.shields.io/badge/Arduino-00979D?style=for-the-badge&logo=Arduino&logoColor=white" alt="Arduino"/>
+  <img src="https://img.shields.io/badge/PlatformIO-F5822A?style=for-the-badge&logo=PlatformIO&logoColor=white" alt="PlatformIO"/>
+  <img src="https://img.shields.io/badge/MQTT-660066?style=for-the-badge&logo=mqtt&logoColor=white" alt="MQTT"/>
+</p>
+
+<p>
+  <img src="https://img.shields.io/badge/Raspberry%20Pi-A22846?style=for-the-badge&logo=Raspberry%20Pi&logoColor=white" alt="Raspberry Pi"/>
+  <img src="https://img.shields.io/badge/InfluxDB-22ADF6?style=for-the-badge&logo=InfluxDB&logoColor=white" alt="InfluxDB"/>
+  <img src="https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=Grafana&logoColor=white" alt="Grafana"/>
+</p>
+
+<p>
+  <a href="#">
+    <img src="https://img.shields.io/badge/📊_Live_Dashboard-Demo-2C3E50?style=for-the-badge" alt="Live Demo"/>
+  </a>
+  <a href="#author">
+    <img src="https://img.shields.io/badge/📧_Contact-Developer-EA4335?style=for-the-badge&logo=gmail" alt="Contact"/>
+  </a>
+</p>
+
+</div>
+
+---
+
+<details open>
+<summary><h2>📑 Table of Contents</h2></summary>
+
+| Section | Description |
+|---------|-------------|
+| [🎯 Overview](#-overview) | ภาพรวมและที่มาของโปรเจกต์ |
+| [✨ Features](#-features) | ฟีเจอร์หลักของการทำงาน |
+| [🏗️ System Architecture](#️-system-architecture) | สถาปัตยกรรมระบบและ Flowchart |
+| [🛠 Tech Stack](#-technologies-used) | เทคโนโลยีและฮาร์ดแวร์ที่ใช้ |
+| [📁 Project Structure](#-project-structure) | โครงสร้างโฟลเดอร์แบบ Modular |
+| [🚀 Getting Started](#-getting-started) | วิธีการติดตั้งและรันโปรเจกต์ |
+| [📊 Dashboard Preview](#-dashboard-preview) | ตัวอย่างหน้าจอ Grafana |
+| [👤 Author](#-author) | ผู้จัดทำ |
+
+</details>
+
+---
+
+## 🎯 Overview
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%"/>
+</div>
+
+**Smart Solar** คือระบบ IoT สำหรับติดตามและควบคุมการทำงานของแผงโซล่าเซลล์และแบตเตอรี่แบบครบวงจร 
+
+**💡 ปัญหา (The Problem):**
+โดยปกติแล้ว Solar Charger ทั่วไปตามท้องตลาด ทำหน้าที่เพียงแค่ประจุไฟเข้าแบตเตอรี่เท่านั้น ไม่สามารถเก็บข้อมูล (Data Logging) หรือวิเคราะห์ประสิทธิภาพการชาร์จได้ ทำให้ผู้ใช้งานไม่ทราบถึงสถานะที่แท้จริงของระบบพลังงานแสงอาทิตย์ของตนเอง
+
+**🎯 ทางแก้ (The Solution):**
+โปรเจกต์นี้จึงถูกพัฒนาขึ้นเพื่อเปลี่ยนระบบธรรมดาให้เป็น **IoT Smart Solar** ที่สามารถ:
+- อ่านค่าแรงดัน (Voltage), กระแส (Current) และกำลังไฟฟ้า (Power) แบบ Real-time
+- เก็บข้อมูลลงฐานข้อมูล InfluxDB เพื่อเรียกดูย้อนหลัง
+- นำเสนอข้อมูลผ่าน Grafana Dashboard ให้เข้าใจง่าย
+- **[Smart Control]** มีระบบจัดการพลังงานอัจฉริยะ หากแบตเตอรี่เต็ม ระบบจะสวิตซ์พลังงานส่วนเกินไปจ่ายให้กับโหลด (เช่น หลอดไฟ LED) อัตโนมัติ หรือควบคุมแบบ Manual ผ่าน Dashboard ได้
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%"/>
+</div>
+
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 📊 Monitoring & Logging
+- **Real-time Metrics:** วัดค่าแรงดันโซล่าเซลล์, แรงดันแบตเตอรี่ และกระแสชาร์จ
+- **Power Calculation:** คำนวณกำลังไฟฟ้า (Power) ที่ผลิตได้
+- **Historical Data:** บันทึกข้อมูลแบบ Time-series เพื่อดูสถิติย้อนหลัง
+- **Data Visualization:** กราฟแสดงผลพลังงานตามช่วงเวลาผ่าน Grafana
+
+</td>
+<td width="50%">
+
+### ⚡ Smart Control & Hardware
+- **Auto Load Switching:** สลับไปจ่ายไฟให้โหลด (LED) ทันทีเมื่อแบตเตอรี่เต็ม
+- **Remote Control:** สั่งงานเปิด-ปิดโหลดได้จากระยะไกลผ่าน Dashboard
+- **Modular Codebase:** เขียนโค้ดแบบ OOP แยกไฟล์ `.h` และ `.cpp` ชัดเจน
+- **Robust IoT Comm:** สื่อสารข้อมูลด้วย MQTT (Mosquitto) ที่เสถียรและรวดเร็ว
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🏗️ System Architecture
+
+<div align="center">
+  <img src="https://via.placeholder.com/800x400/2C3E50/ffffff?text=[+Insert+System+Architecture+Diagram+Here+]" alt="System Architecture"/>
+  <br/>
+  <i>แผนภาพแสดงสถาปัตยกรรมของระบบ Smart Solar</i>
+</div>
+
+<br/>
+
+### 🔄 Code Logic & Flowchart
+
+<div align="center">
+  <img src="https://via.placeholder.com/800x600/ED8F03/ffffff?text=[+Insert+Program+Flowchart+Here+]" alt="Flowchart"/>
+</div>
+
+**หลักการทำงานของโค้ด (Code Logic):**
+1. **Sensor Node (Arduino):** ทำหน้าที่อ่านค่า Analog จากเซ็นเซอร์แรงดันและกระแส คำนวณค่าต่างๆ และส่งข้อมูลผ่าน Serial ไปยัง ESP8266 
+2. **Gateway Node (ESP8266):** รับข้อมูลจาก Arduino นำมาจัดรูปแบบเป็น JSON และ Publish ไปที่ MQTT Broker 
+3. **Logic Control:** บอร์ดจะตรวจสอบค่า `Voltage_Battery` หากพบว่าค่าถึงเกณฑ์ที่กำหนด (แบตเตอรี่เต็ม) จะส่งสัญญาณไปควบคุม Relay เพื่อสวิตซ์พลังงานไปยังโหลดทิ้ง (LED)
+4. **Data Server (Raspberry Pi Zero 2W):** รัน Mosquitto Broker เพื่อรับส่งข้อความ, ใช้ Node-RED/Telegraf ดึงข้อมูลลง InfluxDB และแสดงผลผ่าน Grafana
+
+---
+
+## 🛠 Technologies Used
+
+<div align="center">
+
+| หมวดหมู่ | เทคโนโลยี / อุปกรณ์ |
+|:---:|:---|
+| **Hardware** | ESP8266 (NodeMCU), Arduino (Nano/Uno), เซ็นเซอร์แรงดัน/กระแส, Relay Module |
+| **Server** | Raspberry Pi Zero 2W |
+| **Software IDE** | VS Code + PlatformIO (Arduino Framework) |
+| **IoT Protocol** | MQTT (Mosquitto Broker) |
+| **Database** | InfluxDB (Time-series Database) |
+| **Dashboard** | Grafana |
+
+</div>
+
+---
+
+## 📁 Project Structure
+
+โปรเจกต์นี้ออกแบบโครงสร้างโค้ดแบบ **Modular (แยกส่วนการทำงาน)** โดยใช้หลักการเขียนแบบ Object-Oriented Programming (OOP) ผ่าน Header (`.h`) และ Source (`.cpp`) files เพื่อให้โค้ดอ่านง่ายและง่ายต่อการแก้ไข
+
+```text
+📦 Smart_Solar
+ ┣ 📂 include/                  # โฟลเดอร์เก็บ Header files (.h)
+ ┃ ┣ 📂 esp/                    # Header สำหรับบอร์ด ESP8266
+ ┃ ┃ ┣ 📜 Network.h             # จัดการ WiFi, MQTT, NTP
+ ┃ ┃ ┗ 📜 secret.h              # เก็บค่ารหัสผ่าน (SSID, MQTT_PASS)
+ ┃ ┗ 📂 uno/                    # Header สำหรับบอร์ด Arduino
+ ┃   ┣ 📜 Button_Manange.h      # จัดการสถานะปุ่มกด (Debounce/Interrupt)
+ ┃   ┣ 📜 Send_Callback.h       # จัดการการสื่อสารผ่าน Serial และ JSON
+ ┃   ┗ 📜 sensor.h              # จัดการเซ็นเซอร์ต่างๆ (DHT, Voltage, Current)
+ ┣ 📂 src/                      # โฟลเดอร์เก็บ Source files (.cpp)
+ ┃ ┣ 📂 Esp8266/
+ ┃ ┃ ┣ 📜 Network.cpp           # Logic การเชื่อมต่อต่างๆ
+ ┃ ┃ ┗ 📜 main.cpp              # ลูปการทำงานหลักของ ESP8266
+ ┃ ┗ 📂 uno/
+ ┃   ┣ 📜 Button_Mange.cpp
+ ┃   ┣ 📜 Send_callback.cpp
+ ┃   ┣ 📜 sensor.cpp
+ ┃   ┗ 📜 main.cpp              # ลูปการทำงานหลักของ Arduino
+ ┗ 📜 platformio.ini            # ไฟล์ตั้งค่า PlatformIO และ Library Dependencies
+ 
