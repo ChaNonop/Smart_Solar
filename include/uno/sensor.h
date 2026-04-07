@@ -9,8 +9,9 @@
 
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
+#include "Adafruit_VEML7700.h"
 
-class Sensor {
+class Sensor : Adafruit_VEML7700 {
 private:
     DHT _dht;
     LiquidCrystal_I2C _lcd; // สร้าง Object สำหรับ LCD
@@ -18,16 +19,19 @@ private:
     uint8_t _lightPin;
     uint8_t _vSolarPin;
     uint8_t _vBatteryPin;
-    uint8_t _currentPin;
-    
+    uint8_t _currentPin[2];
+    Adafruit_VEML7700 veml = _Adafruit_VEML7700();
+
     // ค่าที่ประมวลผลแล้ว
     float _temp;
     float _humid;
     int _light;
     float _vSolar;
     float _vBattery;
-    float _current;
-    float _power;
+    float _current_In;
+    float _current_Out;
+    float _power_In;
+    float _power_Out;
 
     // ค่าคงที่วงจร (Voltage Divider)
     float _R1;
@@ -41,12 +45,14 @@ public:
             uint8_t pinLight, 
             uint8_t pinVSolar, 
             uint8_t pinVBattery, 
-            uint8_t pinCurrent);
+            uint8_t pinCurrent_1,
+            uint8_t pinCurrent_2);
             
     void begin();
     void readData(); 
     void readDHTData(); 
     void Button(bool state);
+    void veml_sensor();
     
     // ฟังก์ชันใหม่สำหรับแสดงค่าขึ้นจอ LCD
     void displayLCD(); 

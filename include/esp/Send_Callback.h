@@ -4,7 +4,8 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 #include <ArduinoJson.h>
-#include "sensor.h" 
+
+#include "uno/sensor.h" 
 
 class CommManager {
 private:

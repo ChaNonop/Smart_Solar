@@ -43,9 +43,6 @@ void loop() {
   if (currentMillis - lastAnalogRead >= INTERVAL_ANALOG) {
       lastAnalogRead = currentMillis;
       mySensor.readData();
-      
-      if(mySensor.getLight() >= 100) digitalWrite(Relay_Pin, HIGH);
-      else digitalWrite(Relay_Pin, LOW);
   }
 
   // --- Task 2: อ่านค่า DHT11 ---
@@ -75,6 +72,6 @@ void loop() {
   // --- Task 6: ส่งข้อมูลไป ESP8266 ---
   if (currentMillis - lastSerialSend >= INTERVAL_SEND) {
       lastSerialSend = currentMillis;
-      comm.sendSensorData(mySensor); // โยน Object sensor ให้ Comm จัดการดึงค่าไปส่ง
+      comm.sendSensorData(mySensor); // ส่ง Object sensor ให้ Comm จัดการดึงค่าไปส่ง
   }
 }

@@ -17,8 +17,6 @@ void CommManager::receiveCommands() { //อ่านค่า esp
             // ดึงค่า int 4 ค่าออกมาตาม Format
             int val1 = doc["val1"];
             int val2 = doc["val2"];
-            int val3 = doc["val3"];
-            int val4 = doc["val4"];
 
             Serial.println(F("--- Received Packet from ESP ---"));
             Serial.printf("Value 1: %d\n", val1);
@@ -36,7 +34,8 @@ void CommManager::sendSensorData(Sensor& sensor) {
     doc["Humid"] = sensor.getHumid();
     doc["V_solar"] = sensor.getVSolar();
     doc["V_battery"] = sensor.getVBattery();
-    doc["I"] = sensor.getCurrent();
+    doc["I_In"] = sensor.getCurrent(Current_Pin_In);
+    doc["I_Out"] = sensor.getCurrent(Current_Pin_Out);
     doc["P"] = sensor.getPower();
     doc["Light"] = sensor.getLight();
 
