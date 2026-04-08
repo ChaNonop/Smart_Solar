@@ -8,7 +8,7 @@
 #include <Wire.h> 
 #include "Adafruit_VEML7700.h"
 
-class Sensor : {
+class Sensor {
 private:
     DHT _dht;
     Adafruit_VEML7700 _veml; // สร้าง Object VEML7700
@@ -17,10 +17,8 @@ private:
     uint8_t _vBatteryPin;
     uint8_t _currentPin_In;
     uint8_t _currentPin_Out;
-
     float _R1;
     float _R2;
-
 
     // ค่าที่ประมวลผลแล้ว
     float _temp;
@@ -34,6 +32,9 @@ private:
     int _lux;
 
     byte _sampling;
+    float _offset;
+    float _sensitivity;
+
 
 public:
         // Constructor รับค่าขาสัญญาณทั้งหมด
@@ -54,7 +55,7 @@ public:
 
     // ฟังก์ชัน Getter ไว้สำหรับให้ main.cpp ดึงค่าไปใช้งาน
     float getTemp();
-    float getHumid();;
+    float getHumid();
 
     float getVSolar();
     float getVBattery();

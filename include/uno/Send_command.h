@@ -10,7 +10,6 @@
 class CommManager {
 private:
     SoftwareSerial _serial;
-
 public:
     CommManager(uint8_t rxPin, uint8_t txPin);
     void begin(long baudRate);

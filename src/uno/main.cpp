@@ -6,7 +6,7 @@
 #include "uno/Send_command.h"
 
 // สร้าง Object sensor
-Sensor mySensor(dhtPin,DHT11, Voltage_Pin_solar, Voltage_Pin_Battery,Current_Pin_In,Current_Pin_Out);
+Sensor mySensor(dhtPin,DHT11,Voltage_Pin_solar,Voltage_Pin_Battery,Current_Pin_In,Current_Pin_Out);
 
 CommManager comm(2, 3); // RX = 2, TX = 3
 
