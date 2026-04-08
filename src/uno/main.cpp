@@ -4,26 +4,31 @@
 
 #include "uno/sensor.h"
 #include "uno/Send_command.h"
+#include "uno/display.h"
 
 // สร้าง Object sensor
 Sensor mySensor(dhtPin,DHT11,Voltage_Pin_solar,Voltage_Pin_Battery,Current_Pin_In,Current_Pin_Out);
 
 CommManager comm(2, 3); // RX = 2, TX = 3
+DisplayManager oled; // สร้าง Object จอ OLED
 
 // 2. กำหนดช่วงเวลาทำงาน
 const unsigned long INTERVAL_ANALOG = 100;    
 const unsigned long INTERVAL_DHT = 2000;     
-const unsigned long INTERVAL_SEND = 3000;    
+const unsigned long INTERVAL_SEND = 3000; 
+const unsigned long INTERVAL_OLED = 1000; // อัปเดตจอทุกๆ 1 วินาที   
 
 // ตัวแปรเก็บเวลา
 unsigned long lastAnalogRead = 0;
 unsigned long lastDHTRead = 0;
 unsigned long lastSerialSend = 0;
+unsigned long lastOledUpdate = 0;
 
 
 void setup() {
   Serial.begin(115200);
   mySensor.begin();
+  oled.begin(); // เริ่มทำงานจอ (จะแสกนหาเอง)
   comm.begin(9600); // ความเร็วของ SoftwareSerial สำหรับคุยกับ ESP
 }
 
@@ -44,9 +49,16 @@ void loop() {
   // --- Task 3: รับค่าจาก ESP8266 ---
   comm.receiveCommands();
 
+    // --- Task 4: อัปเดตจอ OLED ---
+  if (currentMillis - lastOledUpdate >= INTERVAL_OLED) {
+      lastOledUpdate = currentMillis;
+      oled.update(mySensor); // โยน object sensor ไปให้จอจัดการวาดค่า
+  }
+
   // --- Task 4: ส่งข้อมูลไป ESP8266 ---
   if (currentMillis - lastSerialSend >= INTERVAL_SEND) {
       lastSerialSend = currentMillis;
       comm.sendSensorData(mySensor); // ส่ง Object sensor ให้ Comm จัดการดึงค่าไปส่ง
   }
+
 }
