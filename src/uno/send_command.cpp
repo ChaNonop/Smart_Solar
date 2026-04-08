@@ -10,7 +10,7 @@ void CommManager::receiveCommands() { //อ่านค่า esp
     if (_serial.available()) {
         String jsonString = _serial.readStringUntil('\n'); 
         
-        StaticJsonDocument<100> doc;
+        StaticJsonDocument<200> doc;
         DeserializationError error = deserializeJson(doc, jsonString);
 
         if (!error) {

@@ -22,7 +22,7 @@ Sensor::Sensor(uint8_t pinDht, uint8_t dhtType, uint8_t pinVSolar, uint8_t pinVB
     _power_Out(0.0),
 
     _lux(0),
-    _sampling(10)
+    _sampling(10),
     _offset(2.5),
     _sensitivity(0.185)
 {
@@ -102,7 +102,7 @@ void Sensor::veml_sensorData(){
   _lux = _veml.readLux(VEML_LUX_AUTO);
 
   Serial.println("------------------------------------");
-  Serial.print("Lux = "); Serial.println(lux);
+  Serial.print("Lux = "); Serial.println(_lux);
   Serial.println("Settings used for reading:");
   Serial.print(F("Gain: "));
   switch (_veml.getGain()) {
