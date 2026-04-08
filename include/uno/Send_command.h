@@ -1,9 +1,10 @@
-#ifndef SEND_CALL_BACK_H
-#define SEND_CALL_BACK_H
+#ifndef SEND_COMMAND_H
+#define SEND_COMMAND_H
 
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 #include <ArduinoJson.h>
+
 #include "sensor.h" 
 
 class CommManager {

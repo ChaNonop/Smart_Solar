@@ -84,7 +84,15 @@ void Network::loop_connect_MQTT() {
   _timeClient->update();
 }
 
-void Network::Publish_Sensor(float volatge_solar,float voltage_battery,float current, float temp, int power, bool buttonState) {
+// Publish
+void Network::Publish_Sensor(
+  float volatge_solar,
+  float voltage_battery,
+  float current,
+  float temp,
+  int power,
+  bool buttonState
+) {
 
   char payload[256];
 

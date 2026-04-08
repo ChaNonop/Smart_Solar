@@ -4,9 +4,12 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
+#include <ArduinoJson.h>
+#include <SoftwareSerial.h>
+
 #include "esp/Network.h"
 #include "esp/secret.h"
-#include "esp/sd_card.h"
+// #include "esp/sd_card.h"
 
 Network net;
 SDCard sd;
@@ -16,5 +19,6 @@ void setup() {
 }
 
 void loop() {
+    if(receive.Commands)
 
 }

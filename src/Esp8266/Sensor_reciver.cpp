@@ -1,4 +1,4 @@
-#include "esp/Send_Callback.h"
+#include "esp/Sensor_reciver.h"
 
 CommManager::CommManager(uint8_t rxPin, uint8_t txPin) : _serial(rxPin, txPin) {}
 
@@ -14,14 +14,16 @@ void CommManager::receiveCommands() { //อ่านค่าจาก uno
         DeserializationError error = deserializeJson(doc, jsonString);
 
         if (!error) {
-            // ดึงค่า int 4 ค่าออกมาตาม Format
-            int Temp = doc["Temp"];
-            int Humid = doc["Humid"];
-            int V_solar = doc["V_solar"];
-            int V_battery = doc["V_battery"];
-            int I = doc["I"];
-            int P = doc["P"];
-            int Light = doc["Light"];
+            // ดึงค่า ออกมาตาม Format
+            float Temp = doc["Temp"];
+            float Humid = doc["Humid"];
+            float V_solar = doc["V_solar"];
+            float V_battery = doc["V_battery"];
+            float I_In = doc["I_In"];
+            float I_Out = doc["I_Out"];
+            float Power_In = doc["Power"];
+            float Power_Out = doc["Power_Out"];
+            float Light = doc["Light"];
         }
             Serial.println(F("--- Received Packet from Uno ---"));
             Serial.printf("Value 1: %d\n", val1);
@@ -32,11 +34,10 @@ void CommManager::receiveCommands() { //อ่านค่าจาก uno
     }
 }
 
+// ส่งค่าไป
 void CommManager::sendSensorData(Sensor& sensor) {
     StaticJsonDocument<200> doc; 
-    doc["Temp"] = sensor.getTemp();
-    doc["Humid"] = sensor.getHumid();
-    doc["V_solar"] = sensor.getVSolar();
+    doc["status"] = 1;
     doc["V_battery"] = sensor.getVBattery();
 
     serializeJson(doc, _serial);
