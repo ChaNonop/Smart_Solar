@@ -52,7 +52,6 @@ public:
     void readDHTData(); 
     void veml_sensorData();
     
-
     // ฟังก์ชัน Getter ไว้สำหรับให้ main.cpp ดึงค่าไปใช้งาน
     float getTemp();
     float getHumid();

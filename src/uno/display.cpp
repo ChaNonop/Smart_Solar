@@ -1,68 +1,70 @@
 #include "uno/display.h"
 
-// Constructor กำหนดค่าเริ่มต้นให้จอ
-DisplayManager::DisplayManager() : _display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET), _isAvailable(false) {}
+DisplayManager::DisplayManager() : _isAvailable(false) {}
 
 void DisplayManager::begin() {
     Wire.begin();
     
-    // แสกนหา Address 0x3C ว่ามีการเชื่อมต่อจออยู่หรือไม่
+    // แสกนหา Address 0x3C
     Wire.beginTransmission(SCREEN_ADDRESS);
     byte error = Wire.endTransmission();
 
     if (error == 0) {
-        Serial.println(F("OLED 128x64 found at address 0x3C!"));
+        Serial.println(F("OLED found!"));
         
-        // ถ้าเจอจอ ให้ Initialize เลย
-        if(_display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-            _isAvailable = true;
-            _display.clearDisplay();
-            _display.setTextSize(1);
-            _display.setTextColor(SSD1306_WHITE);
-            _display.setCursor(0, 0);
-            _display.println(F("Smart Solar Init..."));
-            _display.display();
-            delay(1000); // โชว์ข้อความเริ่มโปรแกรม 1 วินาที
-        }
+        // กำหนดค่าจอและฟอนต์
+        _display.begin(&Adafruit128x64, SCREEN_ADDRESS);
+        _display.setFont(Adafruit5x7); // เปลี่ยนฟอนต์เป็น Adafruit5x7 ซึ่งกลมและอ่านง่ายกว่า
+        
+        _display.clear();
+        _display.set2X(); // ขยายตัวอักษร 2 เท่าหน้า Welcome
+        _display.println(F("Smart"));
+        _display.println(F("Solar"));
+        _display.set1X(); // ปรับขนาดกลับเป็น 1 เท่าเพื่อแสดงค่าเซ็นเซอร์
+        
+        _isAvailable = true;
+        delay(1500);
     } else {
-        // ถ้าไม่เจอจอ ปริ้นบอกผ่าน Serial
-        Serial.println(F("OLED 128x64 NOT found! Skipping display updates."));
+        Serial.println(F("OLED NOT found!"));
         _isAvailable = false;
     }
 }
 
 void DisplayManager::update(Sensor& sensor) {
-    if (!_isAvailable) return; // ถ้าไม่เจอจอตั้งแต่แรก ให้ข้ามฟังก์ชันนี้ไปเลย (ลดการกระตุก)
+    if (!_isAvailable) return;
 
-    _display.clearDisplay();
-    _display.setTextSize(1);
-    _display.setTextColor(SSD1306_WHITE);
+    // เคลียร์จอ
+    _display.clear();
+    
+    // ใช้ setCursor(column, row) เพื่อกำหนดตำแหน่งเป๊ะๆ และเว้นระยะบรรทัด 
+    // Row จะมีตั้งแต่ 0-7 เราจะใช้ Row 0, 2, 4, 6 เพื่อเว้นบรรทัดให้อ่านง่ายสบายตา
+    
+    // --- แถวที่ 1: ข้อมูล Solar (Row 0) ---
     _display.setCursor(0, 0);
-
-    // --- แถวที่ 1: ข้อมูล Solar ---
     _display.print(F("Sol: "));
     _display.print(sensor.getVSolar(), 1);
-    _display.print(F("V "));
+    _display.print(F("V   "));
     _display.print(sensor.getPowerIn(), 1);
-    _display.println(F("W"));
+    _display.print(F("W"));
 
-    // --- แถวที่ 2: ข้อมูล Battery ---
+    // --- แถวที่ 2: ข้อมูล Battery (Row 2) ---
+    _display.setCursor(0, 2);
     _display.print(F("Bat: "));
     _display.print(sensor.getVBattery(), 1);
-    _display.print(F("V "));
+    _display.print(F("V   "));
     _display.print(sensor.getPowerOut(), 1);
-    _display.println(F("W"));
+    _display.print(F("W"));
 
-    // --- แถวที่ 3: สภาพแวดล้อม ---
-    _display.print(F("T:"));
+    // --- แถวที่ 3: สภาพแวดล้อม (Row 4) ---
+    _display.setCursor(0, 4);
+    _display.print(F("T: "));
     _display.print(sensor.getTemp(), 1);
-    _display.print(F("C H:"));
+    _display.print(F("C   H: "));
     _display.print(sensor.getHumid(), 0);
-    _display.println(F("%"));
+    _display.print(F("%"));
 
-    // --- แถวที่ 4: ความสว่าง ---
+    // --- แถวที่ 4: ความสว่าง (Row 6) ---
+    _display.setCursor(0, 6);
     _display.print(F("Lux: "));
-    _display.println(sensor.getLux(), 0);
-
-    _display.display(); // สั่งวาดข้อมูลทั้งหมดลงจอ
+    _display.print(sensor.getLux(), 0);
 }

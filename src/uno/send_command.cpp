@@ -40,10 +40,10 @@ void CommManager::sendSensorData(Sensor& sensor) {
     doc["Power_Out"] = sensor.getPowerOut();
     doc["lux"] = sensor.getLux();
 
-    serializeJson(doc, _serial);
-    _serial.println(); 
+    // serializeJson(doc, _serial);
+    // _serial.println(); 
 
-    // พิมพ์ออก Serial Monitor 
-    serializeJson(doc, Serial);
-    Serial.println();
+    // // พิมพ์ออก Serial Monitor 
+    // serializeJson(doc, Serial);
+    // Serial.println();
 }

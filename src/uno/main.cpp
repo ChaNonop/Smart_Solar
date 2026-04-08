@@ -49,10 +49,22 @@ void loop() {
   // --- Task 3: รับค่าจาก ESP8266 ---
   comm.receiveCommands();
 
-    // --- Task 4: อัปเดตจอ OLED ---
+    // --- Task 4: อัปเดตจอ ---
   if (currentMillis - lastOledUpdate >= INTERVAL_OLED) {
       lastOledUpdate = currentMillis;
       oled.update(mySensor); // โยน object sensor ไปให้จอจัดการวาดค่า
+    
+    Serial.println("------------------------------------");
+    Serial.print("Lux = "); Serial.println(mySensor.getLux()); 
+    Serial.print("Temp = "); Serial.println(mySensor.getTemp());
+    Serial.print("Humid = "); Serial.println(mySensor.getHumid());
+    Serial.print("V_solar = "); Serial.println(mySensor.getVSolar());
+    Serial.print("V_battery = "); Serial.println(mySensor.getVBattery());
+    Serial.print("I_In = "); Serial.println(mySensor.getCurrentIn());
+    Serial.print("I_Out = "); Serial.println(mySensor.getCurrentOut());
+    Serial.print("Power_In = "); Serial.println(mySensor.getPowerIn());
+    Serial.print("Power_Out = "); Serial.println(mySensor.getPowerOut());
+    Serial.println("------------------------------------");
   }
 
   // --- Task 4: ส่งข้อมูลไป ESP8266 ---
