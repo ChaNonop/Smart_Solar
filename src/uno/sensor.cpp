@@ -46,6 +46,7 @@ void Sensor::begin() {
 // ฟังก์ชันที่ 1: อ่านค่า Analog (Voltage & Current)
 void Sensor::readData() {
     float resistorRatio = (_R1 + _R2) / _R2;
+
     long sumVSolar = 0;
     long sumVBattery = 0;
     long sumCurrent_In = 0;
@@ -101,13 +102,12 @@ void Sensor::readDHTData() {
 void Sensor::veml_sensorData(){
       // to read lux using automatic method, specify VEML_LUX_AUTO
   _lux = _veml.readLux(VEML_LUX_AUTO);
-
 }
 
 
 // ---- Getters ----
-float Sensor::getTemp() { return .2f * (float)_temp; }
-float Sensor::getHumid() { return .2f * (float)_humid; }
+float Sensor::getTemp() { return _temp; }
+float Sensor::getHumid() { return _humid; }
 float Sensor::getVSolar() { return .2f * (float)_vSolar; }
 float Sensor::getVBattery() { return .2f * (float)_vBattery; }
 
@@ -117,6 +117,6 @@ float Sensor::getCurrentOut() { return .2f * (float)_current_Out; }
 float Sensor::getPowerIn() { return .2f * (float)_power_In; }
 float Sensor::getPowerOut() { return .2f * (float)_power_Out; }
 
-float Sensor::getLux() { return .2f * (float)_lux; }
+float Sensor::getLux() { return _lux; }
 
 

@@ -14,13 +14,15 @@ DisplayManager oled; // สร้าง Object จอ OLED
 
 // 2. กำหนดช่วงเวลาทำงาน
 const unsigned long INTERVAL_ANALOG = 100;    
-const unsigned long INTERVAL_DHT = 2000;     
+const unsigned long INTERVAL_DHT = 2000;  
+const unsigned long INTERVAL_VEML = 1000;   
 const unsigned long INTERVAL_SEND = 3000; 
-const unsigned long INTERVAL_OLED = 1000; // อัปเดตจอทุกๆ 1 วินาที   
+const unsigned long INTERVAL_OLED = 1000; 
 
 // ตัวแปรเก็บเวลา
 unsigned long lastAnalogRead = 0;
 unsigned long lastDHTRead = 0;
+unsigned long lastVEMLRead = 0;
 unsigned long lastSerialSend = 0;
 unsigned long lastOledUpdate = 0;
 
@@ -35,21 +37,28 @@ void setup() {
 void loop() {
   unsigned long currentMillis = millis();
   
-  // --- Task 1: อ่านค่า Analog ---
+  // Task 1: อ่านค่า Analog ---
   if (currentMillis - lastAnalogRead >= INTERVAL_ANALOG) {
       lastAnalogRead = currentMillis;
       mySensor.readData();
   }
 
-  // --- Task 2: อ่านค่า DHT11 ---
+  // Task 2: อ่านค่า DHT11 ---
   if (currentMillis - lastDHTRead >= INTERVAL_DHT) {
       lastDHTRead = currentMillis;
       mySensor.readDHTData();
   }
-  // --- Task 3: รับค่าจาก ESP8266 ---
+
+    // Task 3: อ่านค่า VEML7700 (เพิ่ม Task นี้เข้ามา) ---
+  if (currentMillis - lastVEMLRead >= INTERVAL_VEML) {
+      lastVEMLRead = currentMillis;
+      mySensor.veml_sensorData();
+  }
+
+  // Task 4: รับค่าจาก ESP8266 
   comm.receiveCommands();
 
-    // --- Task 4: อัปเดตจอ ---
+    // Task 5: อัปเดตจอ 
   if (currentMillis - lastOledUpdate >= INTERVAL_OLED) {
       lastOledUpdate = currentMillis;
       oled.update(mySensor); // โยน object sensor ไปให้จอจัดการวาดค่า
@@ -67,7 +76,7 @@ void loop() {
     Serial.println("------------------------------------");
   }
 
-  // --- Task 4: ส่งข้อมูลไป ESP8266 ---
+  // --- Task 6 : ส่งข้อมูลไป ESP8266 ---
   if (currentMillis - lastSerialSend >= INTERVAL_SEND) {
       lastSerialSend = currentMillis;
       comm.sendSensorData(mySensor); // ส่ง Object sensor ให้ Comm จัดการดึงค่าไปส่ง
