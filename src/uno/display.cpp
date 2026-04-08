@@ -1,4 +1,5 @@
 #include "uno/display.h"
+#include "uno/Debug.h"
 
 DisplayManager::DisplayManager() : _isAvailable(false) {}
 

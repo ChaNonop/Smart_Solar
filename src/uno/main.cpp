@@ -5,6 +5,7 @@
 #include "uno/sensor.h"
 #include "uno/Send_command.h"
 #include "uno/display.h"
+#include "uno/Debug.h"
 
 // สร้าง Object sensor
 Sensor mySensor(dhtPin,DHT11,Voltage_Pin_solar,Voltage_Pin_Battery,Current_Pin_In,Current_Pin_Out);

@@ -1,4 +1,5 @@
 #include "uno/sensor.h"
+#include "uno/Debug.h"
 
 Sensor::Sensor(uint8_t pinDht, uint8_t dhtType, uint8_t pinVSolar, uint8_t pinVBattery, uint8_t PinCurrent_1, uint8_t PinCurrent_2)
 :   _dht(pinDht, dhtType),

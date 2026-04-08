@@ -1,4 +1,5 @@
 #include "uno/Send_command.h"
+#include "uno/Debug.h"
 
 CommManager::CommManager(uint8_t rxPin, uint8_t txPin) : _serial(rxPin, txPin) {}
 
