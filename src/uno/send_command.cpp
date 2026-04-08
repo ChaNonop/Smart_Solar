@@ -1,4 +1,4 @@
-#include "uno/Send_Callback.h"
+#include "uno/send_command.h"
 
 CommManager::CommManager(uint8_t rxPin, uint8_t txPin) : _serial(rxPin, txPin) {}
 
@@ -36,8 +36,9 @@ void CommManager::sendSensorData(Sensor& sensor) {
     doc["V_battery"] = sensor.getVBattery();
     doc["I_In"] = sensor.getCurrent(Current_Pin_In);
     doc["I_Out"] = sensor.getCurrent(Current_Pin_Out);
-    doc["P"] = sensor.getPower();
-    doc["Light"] = sensor.getLight();
+    doc["Power_In"] = sensor.getPower(_power_In);
+    doc["Power_Out"] = sensor.getPower(_power_out);
+    doc["lux"] = sensor.veml_sensor(lux);
 
     serializeJson(doc, _serial);
     _serial.println(); 
