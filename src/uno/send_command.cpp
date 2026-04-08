@@ -1,4 +1,4 @@
-#include "uno/send_command.h"
+#include "uno/Send_command.h"
 
 CommManager::CommManager(uint8_t rxPin, uint8_t txPin) : _serial(rxPin, txPin) {}
 
@@ -34,16 +34,16 @@ void CommManager::sendSensorData(Sensor& sensor) {
     doc["Humid"] = sensor.getHumid();
     doc["V_solar"] = sensor.getVSolar();
     doc["V_battery"] = sensor.getVBattery();
-    doc["I_In"] = sensor.getCurrent(_current_In);
-    doc["I_Out"] = sensor.getCurrent(_current_Out);
-    doc["Power_In"] = sensor.getPower(_power_In);
-    doc["Power_Out"] = sensor.getPower(_power_out);
-    doc["lux"] = sensor.veml_sensor();
+    doc["I_In"] = sensor.getCurrentIn();
+    doc["I_Out"] = sensor.getCurrentOut();
+    doc["Power_In"] = sensor.getPowerIn();
+    doc["Power_Out"] = sensor.getPowerOut();
+    doc["lux"] = sensor.getLux();
 
     serializeJson(doc, _serial);
     _serial.println(); 
 
-    // พิมพ์ออก Serial Monitor เพื่อเช็คความถูกต้อง
+    // พิมพ์ออก Serial Monitor 
     serializeJson(doc, Serial);
     Serial.println();
 }

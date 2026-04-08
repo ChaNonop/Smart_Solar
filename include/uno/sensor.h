@@ -2,26 +2,25 @@
 #define SENSOR_H
 
 #include <Arduino.h>
-
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <DHT_U.h>
-
 #include <Wire.h> 
 #include "Adafruit_VEML7700.h"
 
-class Sensor : Adafruit_VEML7700 {
+class Sensor : {
 private:
     DHT _dht;
+    Adafruit_VEML7700 _veml; // สร้าง Object VEML7700
 
     uint8_t _vSolarPin;
     uint8_t _vBatteryPin;
     uint8_t _currentPin_In;
     uint8_t _currentPin_Out;
-    uint8_t _R1;
-    uint8_t _R2;
 
-    Adafruit_VEML7700 veml = _Adafruit_VEML7700();
+    float _R1;
+    float _R2;
+
 
     // ค่าที่ประมวลผลแล้ว
     float _temp;
@@ -50,18 +49,22 @@ public:
     void begin();
     void readData(); 
     void readDHTData(); 
-    void Button(bool state);
-    void veml_sensor();
+    void veml_sensorData();
     
 
     // ฟังก์ชัน Getter ไว้สำหรับให้ main.cpp ดึงค่าไปใช้งาน
     float getTemp();
-    float getHumid();
-    int getLight();
+    float getHumid();;
+
     float getVSolar();
     float getVBattery();
-    float getCurrent();
-    float getPower();
+
+    float getCurrentIn();
+    float getCurrentOut();
+
+    float getPowerIn();
+    float getPowerOut();
+    
     float getLux();
 };
 
