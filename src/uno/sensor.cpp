@@ -45,8 +45,11 @@ void Sensor::begin() {
 // ฟังก์ชันที่ 1: อ่านค่า Analog (Voltage & Current)
 void Sensor::readData() {
     float resistorRatio = (_R1 + _R2) / _R2;
-    long sumVSolar = 0, sumVSolar = 0, sumVBattery = 0,sumCurrent_In = 0, sumCurrent_Out = 0;
-    
+    long sumVSolar = 0;
+    long sumVBattery = 0;
+    long sumCurrent_In = 0;
+    long sumCurrent_Out = 0;
+
     for(int j = 0; j < _sampling; j++){
         sumVSolar += analogRead(_vSolarPin);
         sumVBattery += analogRead(_vBatteryPin);
