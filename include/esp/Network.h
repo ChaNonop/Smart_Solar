@@ -2,31 +2,47 @@
 #define NETWORK_H
 
 #include <Arduino.h>
-#include <ESP8266Wifi.h>
+#include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
+#include <ArduinoJson.h>
 
-// #include <U8g2lib.h>
-#include <esp/secret.h>
-class Network {
+#include "esp/secret.h"
+
+class NetworkManager {
 private:
-  WiFiClient _espClient;
-  PubSubClient _client;
-  WiFiUDP _ntp;
-  NTPClient* _timeClient; // ใช้ Pointer เพื่อจัดการ Object
-  void reconnectMQTT();
+    WiFiClient _wifiClient;
+    PubSubClient _mqttClient;
+    WiFiUDP _ntpUDP;
+    NTPClient _timeClient;
+
+    const char* _ssid;
+    const char* _password;
+    const char* _mqttServer;
+    int _mqttPort;
+    const char* _mqttUser;
+    const char* _mqttPass;
+    const char* _mqttTopic;
+
+    void connectWiFi();
+    void connectMQTT();
 
 public:
-  Network();
-  void ntp_setup();
-  void connectWifi();      
-  void connectMQTT();
-  void loop_connect_MQTT();
+    // Constructor รับค่า Configuration
+    NetworkManager(const char* ssid, const char* password, 
+                   const char* mqttServer, int mqttPort, 
+                   const char* mqttUser, const char* mqttPass, 
+                   const char* mqttTopic);
 
-  void Publish_Sensor(float volatge_solar,float voltage_battery,float current, float temp, int power, bool buttonState);
-  
-  void Callback(char* topic, uint8_t* payload, unsigned int length); 
+    void begin();
+    void loop(); // คอยเรียกในลูปเพื่อรักษาการเชื่อมต่อและอัปเดตเวลา
+
+    // ส่งข้อมูล JSON ขึ้น MQTT
+    bool publishData(JsonDocument& sensorData);
+    
+    // ดึงเวลาปัจจุบัน (Epoch Time)
+    unsigned long getCurrentTime();
 };
 
-#endif 
+#endif

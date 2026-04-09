@@ -1,127 +1,100 @@
-#include "Network.h"
-#include "secret.h"
-#include <Arduino.h>
+#include "esp/Network.h"
 
-static Network* _net_instance = nullptr;
+// กำหนด Timezone สำหรับกรุงเทพฯ (GMT+7) = 7 * 60 * 60 = 25200 วินาที
+const long utcOffsetInSeconds = 25200; 
 
-void mqttCallback(char* topic, uint8_t* payload, unsigned int length) {
-  if (_net_instance) _net_instance->Callback(topic, payload, length);
+NetworkManager::NetworkManager(const char* ssid, const char* password, 
+                               const char* mqttServer, int mqttPort, 
+                               const char* mqttUser, const char* mqttPass,
+                               const char* mqttTopic)
+    : _ssid(ssid), _password(password), 
+      _mqttServer(mqttServer), _mqttPort(mqttPort),
+      _mqttUser(mqttUser), _mqttPass(mqttPass), _mqttTopic(mqttTopic),
+      _mqttClient(_wifiClient), 
+      _timeClient(_ntpUDP, "pool.ntp.org", utcOffsetInSeconds, 86400000) // อัปเดตเวลาทุก 1 วัน
+{
 }
 
-Network::Network() : _client(_espClient) {
-  _net_instance = this;
-  _client.setServer(MQTT_SERVER, MQTT_PORT);
-  _client.setCallback(mqttCallback);
-  _timeClient = new NTPClient(_ntp, "asia.pool.ntp.org", 7*3600, 86400000*2);   // Init NTP Client (ยังไม่ start)  อัปเดต 2 วันครั้ง
-}
-void Network::ntp_setup() {
-  _timeClient->begin();
-  if(!_timeClient->update()){
-    _timeClient->forceUpdate();
-  }
-  Serial.printf("Current Time: %s\n",_timeClient->getFormattedTime());
-  }
+void NetworkManager::begin() {
+    connectWiFi();
+    
+    _mqttClient.setServer(_mqttServer, _mqttPort);
+    connectMQTT();
 
-void Network::connectWifi() {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.print(F("Connecting WiFi"));
-
-  unsigned long start = millis();
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-    if (millis() - start > 20000) { // timeout 20s
-      break; // timeout 
-    } 
-  }
-  if(WiFi.status() == WL_CONNECTED){
-      Serial.print(F("\nWiFi Connected, IP: "));
-      Serial.println(WiFi.localIP());
-  }
+    _timeClient.begin();
 }
 
-void Network::connectMQTT() {
-  if (!_client.connected()) {
-    reconnectMQTT();
-  }
-}
+void NetworkManager::connectWiFi() {
+    Serial.print(F("Connecting to WiFi: "));
+    Serial.println(_ssid);
+    
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(_ssid, _password);
 
-void Network::reconnectMQTT() {
-  // ใช้ static variable เพื่อจำค่าเวลาครั้งล่าสุดที่ลองเชื่อมต่อ (Non-blocking Timer)
-  static unsigned long lastReconnectAttempt = 0;
-  unsigned long now = millis();
-
-  // เช็คว่าผ่านไป 5 วินาทีหรือยัง? ถ้ายังไม่ถึง ให้ข้ามไปเลย
-  if (now - lastReconnectAttempt > 5000) {
-    lastReconnectAttempt = now; // อัปเดตเวลาล่าสุด
-
-    if (!_client.connected()) {
-      Serial.print(F("Attempting MQTT connection..."));
-      // Create a random client ID
-      String clientId = MQTT_CLIENT;
-      clientId += String(random(0xffff), HEX);
-      
-      // ลองเชื่อมต่อ (คำสั่ง connect )
-      if (_client.connect(clientId.c_str(), MQTT_USER, MQTT_PASS)) {
-        Serial.print(F("connected\n"));
-        _client.subscribe("/Command");
-        lastReconnectAttempt = 0; // รีเซ็ตเวลาเพื่อให้ครั้งหน้าพร้อมทำงานทันทีถ้าหลุดอีก
-      } else {
-        Serial.printf("failed, rc= %d\n",_client.state());
-        Serial.print(F(" (try again in 5 seconds)\n"));
-      }
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(F("."));
     }
-  }
+    Serial.println(F("\nWiFi Connected!"));
+    Serial.print(F("IP Address: "));
+    Serial.println(WiFi.localIP());
 }
 
-void Network::loop_connect_MQTT() {
-  // เช็คและพยายามเชื่อมต่อใหม่แบบ Non-blocking
-  if (!_client.connected()) {
-    reconnectMQTT();
-  }
-  _client.loop();
-  _timeClient->update();
-}
-
-// Publish
-void Network::Publish_Sensor(
-  float volatge_solar,
-  float voltage_battery,
-  float current,
-  float temp,
-  int power,
-  bool buttonState
-) {
-
-  char payload[256];
-
-  // ดึงเวลาปัจจุบัน (Unix Timestamp)
-  unsigned long epochTime = _timeClient->getEpochTime();
-
-  // Send Data Json format
-  int len = snprintf(payload, sizeof(payload), 
-            "{\"Voltage_solar\":%.2f,\"Voltage_battery\":%.2f,\"Current\":%.2f,\"Temp\":%.2f,\"Power\":%d,\"button_state\":%u,\"time_ms\":%lu}",
-             volatge_solar, voltage_battery, current, temp, power, buttonState ? 1 : 0, epochTime);
-  
-  _client.publish("/MyProject/sensor", payload, (unsigned int)len);
-  Serial.printf("Published: %s \n",payload);
-}
-
-// Subscribe 
-void Network::Callback(char* topic, uint8_t* payload, unsigned int length) {
-  Serial.printf("Message arrived [%c]",topic);
-  String message;
-  for (unsigned int i = 0; i < length; i++) {
-    message += (char)payload[i];
-  }
-  Serial.printf(" %s\n", message);
-  
-  if (String(topic) == "/MyProject/Command") {
-    if (message == "ON" || message == "1") {
-      Serial.print(F("Command: ON\n"));
-    } else if (message == "OFF" || message == "0") {
-      Serial.print(F("Command: OFF\n"));
+void NetworkManager::connectMQTT() {
+    // พยายามเชื่อมต่อจนกว่าจะสำเร็จ
+    while (!_mqttClient.connected()) {
+        Serial.print(F("Connecting to MQTT... "));
+        
+        // สร้าง Client ID แบบสุ่ม
+        String clientId = "SmartSolar-ESP8266-" + String(random(0xffff), HEX);
+        
+        if (_mqttClient.connect(clientId.c_str(), _mqttUser, _mqttPass)) {
+            Serial.println(F("Connected!"));
+        } else {
+            Serial.print(F("Failed, rc="));
+            Serial.print(_mqttClient.state());
+            Serial.println(F(" Try again in 5 seconds"));
+            delay(5000);
+        }
     }
-  }
+}
+
+void NetworkManager::loop() {
+    if (WiFi.status() != WL_CONNECTED) {
+        connectWiFi();
+    }
+    
+    if (!_mqttClient.connected()) {
+        connectMQTT();
+    }
+    
+    _mqttClient.loop();
+    _timeClient.update(); // อัปเดตเวลาจาก NTP
+}
+
+unsigned long NetworkManager::getCurrentTime() {
+    return _timeClient.getEpochTime();
+}
+
+bool NetworkManager::publishData(JsonDocument& sensorData) {
+    if (!_mqttClient.connected()) return false;
+
+    // แทรกเวลาปัจจุบันเข้าไปใน JSON Payload
+    sensorData["timestamp"] = getCurrentTime();
+
+    // แปลง JSON เป็น String
+    String payload;
+    serializeJson(sensorData, payload);
+
+    // ส่งขึ้น MQTT
+    bool success = _mqttClient.publish(_mqttTopic, payload.c_str());
+    
+    if (success) {
+        Serial.println(F("Data published successfully."));
+        // Serial.println(payload); // เปิดคอมเมนต์นี้ถ้าอยากดูข้อมูลที่ส่งไป
+    } else {
+        Serial.println(F("Failed to publish data."));
+    }
+
+    return success;
 }

@@ -1,22 +1,20 @@
-#ifndef SEND_CALL_BACK_H
-#define SEND_CALL_BACK_H
+#ifndef SENSOR_RECEIVER_H
+#define SENSOR_RECEIVER_H
 
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 #include <ArduinoJson.h>
 
-#include "uno/sensor.h" 
-
-class CommManager {
+class SensorReceiver {
 private:
     SoftwareSerial _serial;
 
 public:
-    CommManager(uint8_t rxPin, uint8_t txPin);
+    SensorReceiver(uint8_t rxPin, uint8_t txPin);
     void begin(long baudRate);
     
-    void receiveCommands();
-    void sendSensorData(Sensor& sensor); // รับ Reference ของ Sensor มาใช้งาน
+    // คอยรับข้อมูล ถ้ามีข้อมูลสมบูรณ์จะคืนค่า true และใส่ข้อมูลลงใน doc
+    bool receiveData(JsonDocument& doc); 
 };
 
 #endif
