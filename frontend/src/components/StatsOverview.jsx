@@ -1,13 +1,20 @@
 import React from 'react';
 import { Sun, BatteryCharging, Power, Wifi } from 'lucide-react';
 
-export default function StatsOverview({ devices }) {
-  const onlineCount = devices.filter(d => d.is_online).length;
+export default function StatsOverview({ nodes }) {
+  const totalNodes = nodes.length;
+  const onlineCount = nodes.filter(n => n.is_online).length;
   
-  const totalSolarPower = devices.reduce((sum, d) => sum + (d.is_online ? d.solar_power : 0), 0);
-  const totalBatteryPower = devices.reduce((sum, d) => sum + (d.is_online ? d.battery_power : 0), 0);
+  const totalSolarPower = nodes.reduce((sum, n) => sum + (n.is_online ? n.solar_power : 0), 0);
+  const totalBatteryPower = nodes.reduce((sum, n) => sum + (n.is_online ? n.battery_power : 0), 0);
   
-  const activeRelays = devices.filter(d => d.relay_status && d.is_online).length;
+  // Count active relays (both relay1 and relay2)
+  const activeRelays = nodes.reduce((sum, n) => {
+    if (!n.is_online) return sum;
+    return sum + (n.relay1 === 1 ? 1 : 0) + (n.relay2 === 1 ? 1 : 0);
+  }, 0);
+
+  const maxPossibleRelays = onlineCount * 2;
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
@@ -17,7 +24,7 @@ export default function StatsOverview({ devices }) {
           <div>
             <p className="text-sm font-medium text-slate-400">Active Nodes</p>
             <h4 className="mt-2 text-3xl font-extrabold text-white">
-              {onlineCount} <span className="text-sm font-normal text-slate-500">/ 5</span>
+              {onlineCount} <span className="text-sm font-normal text-slate-500">/ {totalNodes}</span>
             </h4>
           </div>
           <div className={`rounded-xl p-3 border ${
@@ -29,7 +36,9 @@ export default function StatsOverview({ devices }) {
           </div>
         </div>
         <div className="mt-4 flex items-center text-xs text-slate-400">
-          <span className="font-semibold text-emerald-400 mr-1.5">{onlineCount * 20}%</span>
+          <span className="font-semibold text-emerald-400 mr-1.5">
+            {totalNodes > 0 ? ((onlineCount / totalNodes) * 100).toFixed(0) : 0}%
+          </span>
           <span>online and publishing data</span>
         </div>
       </div>
@@ -80,7 +89,7 @@ export default function StatsOverview({ devices }) {
           <div>
             <p className="text-sm font-medium text-slate-400">Active Relays</p>
             <h4 className="mt-2 text-3xl font-extrabold text-white">
-              {activeRelays} <span className="text-sm font-normal text-slate-500">/ 5</span>
+              {activeRelays} <span className="text-sm font-normal text-slate-500">/ {maxPossibleRelays}</span>
             </h4>
           </div>
           <div className={`rounded-xl p-3 border ${
