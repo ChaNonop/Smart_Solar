@@ -6,6 +6,9 @@ Hardward/.vscode/ipch
 simulator
 .agents
 run_project.ps1
+backend\venv
+backend\app\__pycache__
+
 # .vscode/launch.json
 # .vscode/ipch
 # include/esp/secret.h
