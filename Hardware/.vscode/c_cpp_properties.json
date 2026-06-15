@@ -1,0 +1,79 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "C:/1.MyProject/SolarCharger/include",
+                "C:/1.MyProject/SolarCharger/src",
+                "C:/Users/Andre/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/SSD1306Ascii/src",
+                "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/Adafruit VEML7700 Library",
+                "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/Adafruit BusIO",
+                "C:/Users/Andre/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "C:/Users/Andre/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/ArduinoJson/src",
+                "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/DHT sensor library",
+                "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/Adafruit Unified Sensor",
+                "C:/Users/Andre/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "C:/Users/Andre/.platformio/packages/framework-arduino-avr/variants/eightanaloginputs",
+                "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/Adafruit GFX Library",
+                "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/Adafruit SSD1306",
+                "C:/Users/Andre/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "C:/Users/Andre/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "C:/1.MyProject/SolarCharger/include",
+                    "C:/1.MyProject/SolarCharger/src",
+                    "C:/Users/Andre/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/SSD1306Ascii/src",
+                    "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/Adafruit VEML7700 Library",
+                    "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/Adafruit BusIO",
+                    "C:/Users/Andre/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "C:/Users/Andre/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/ArduinoJson/src",
+                    "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/DHT sensor library",
+                    "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/Adafruit Unified Sensor",
+                    "C:/Users/Andre/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "C:/Users/Andre/.platformio/packages/framework-arduino-avr/variants/eightanaloginputs",
+                    "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/Adafruit GFX Library",
+                    "C:/1.MyProject/SolarCharger/.pio/libdeps/arduino/Adafruit SSD1306",
+                    "C:/Users/Andre/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "C:/Users/Andre/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=60119",
+                "ARDUINO_AVR_NANO",
+                "TX=2",
+                "RX=3",
+                "dhtPin=10",
+                "Voltage_Pin_solar=A1",
+                "Voltage_Pin_Battery=A2",
+                "Current_Pin_In=A6",
+                "Current_Pin_Out=A7",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "__AVR_ATmega328P__",
+                ""
+            ],
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
+            "compilerPath": "C:/Users/Andre/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
+            "compilerArgs": [
+                "-mmcu=atmega328p",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}
